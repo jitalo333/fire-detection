@@ -1,11 +1,11 @@
 FROM nvcr.io/nvidia/pytorch:22.12-py3
 
-# ==== EVITAR PROMPTS INTERACTIVOS ====
+# ==== NO INTERACTIVE ====
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Santiago
 ENV _JAVA_OPTIONS="-Djava.awt.headless=true"
 
-# ==== SYSTEM DEPS (SNAP) ====
+# ==== SYSTEM DEPS ====
 RUN apt-get update && apt-get install -y \
     tzdata \
     wget \
@@ -25,13 +25,12 @@ RUN wget https://download.esa.int/step/snap/9.0/installers/esa-snap_all_unix_9_0
     /tmp/snap.sh -q -dir ${SNAP_HOME} && \
     rm /tmp/snap.sh
 
-# ==== SNAP SAR MODULES (SIN REFRESH) ====
-RUN ${SNAP_HOME}/bin/snap --nosplash --modules --install org.esa.snap.sar
+# ==== NO SNAP MODULE INSTALL AT BUILD TIME ====
+# SNAP descargará SAR automáticamente al ejecutar gpt/snap
 
-# ==== PIP SETUP ====
+# ==== PIP ====
 RUN python -m pip install --upgrade pip
 
-# ==== WORKDIR ====
 WORKDIR /tmp
 ENV PATH=$PATH:/root/.local/bin
 
