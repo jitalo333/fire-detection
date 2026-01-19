@@ -1,11 +1,18 @@
 FROM nvcr.io/nvidia/pytorch:22.12-py3
 
+# ==== EVITAR PROMPTS INTERACTIVOS (CRÍTICO) ====
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Santiago
+
 # ==== SYSTEM DEPS (OBLIGATORIO PARA SNAP) ====
 RUN apt-get update && apt-get install -y \
+    tzdata \
     wget \
     ca-certificates \
     git \
     openjdk-17-jdk \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone \
     && rm -rf /var/lib/apt/lists/*
 
 # ==== SNAP INSTALL ====
@@ -25,10 +32,10 @@ RUN ${SNAP_HOME}/bin/snap --nosplash --modules --refresh && \
 RUN python -m pip install --upgrade pip
 
 # ==== WORKDIR ====
-WORKDIR /tmp/
+WORKDIR /tmp
 ENV PATH=$PATH:/root/.local/bin
 
-COPY . /tmp/
+COPY . /tmp
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8880
