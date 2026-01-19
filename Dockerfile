@@ -1,21 +1,35 @@
+FROM nvcr.io/nvidia/pytorch:22.12-py3
+
+# ==== SYSTEM DEPS (OBLIGATORIO PARA SNAP) ====
+RUN apt-get update && apt-get install -y \
+    wget \
+    ca-certificates \
+    git \
+    openjdk-17-jdk \
+    && rm -rf /var/lib/apt/lists/*
+
 # ==== SNAP INSTALL ====
 ENV SNAP_HOME=/opt/snap
+ENV PATH=${PATH}:${SNAP_HOME}/bin
 
 RUN wget https://download.esa.int/step/snap/9.0/installers/esa-snap_all_unix_9_0_0.sh -O /tmp/snap.sh && \
     chmod +x /tmp/snap.sh && \
     /tmp/snap.sh -q -dir ${SNAP_HOME} && \
     rm /tmp/snap.sh
 
-FROM nvcr.io/nvidia/pytorch:22.12-py3
+# ==== SNAP SAR MODULES (CLAVE) ====
+RUN ${SNAP_HOME}/bin/snap --nosplash --modules --refresh && \
+    ${SNAP_HOME}/bin/snap --nosplash --modules --install org.esa.snap.sar
+
 # ==== PIP SETUP ====
 RUN python -m pip install --upgrade pip
-# INSTALLING IMPORTANT DEPENDENCIES
-RUN apt-get update -y
-RUN apt-get install -y git
-COPY . /tmp/
-RUN apt-get update
-# ==== BUILDING WORKING DIR ====
+
+# ==== WORKDIR ====
 WORKDIR /tmp/
-ENV PATH=$PATH:~/.local/bin
+ENV PATH=$PATH:/root/.local/bin
+
+COPY . /tmp/
 RUN pip3 install -r requirements.txt
+
 EXPOSE 8880
+
