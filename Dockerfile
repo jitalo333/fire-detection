@@ -1,10 +1,11 @@
 FROM nvcr.io/nvidia/pytorch:22.12-py3
 
-# ==== EVITAR PROMPTS INTERACTIVOS (CRÍTICO) ====
+# ==== EVITAR PROMPTS INTERACTIVOS ====
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Santiago
+ENV _JAVA_OPTIONS="-Djava.awt.headless=true"
 
-# ==== SYSTEM DEPS (OBLIGATORIO PARA SNAP) ====
+# ==== SYSTEM DEPS (SNAP) ====
 RUN apt-get update && apt-get install -y \
     tzdata \
     wget \
@@ -24,9 +25,8 @@ RUN wget https://download.esa.int/step/snap/9.0/installers/esa-snap_all_unix_9_0
     /tmp/snap.sh -q -dir ${SNAP_HOME} && \
     rm /tmp/snap.sh
 
-# ==== SNAP SAR MODULES (CLAVE) ====
-RUN ${SNAP_HOME}/bin/snap --nosplash --modules --refresh && \
-    ${SNAP_HOME}/bin/snap --nosplash --modules --install org.esa.snap.sar
+# ==== SNAP SAR MODULES (SIN REFRESH) ====
+RUN ${SNAP_HOME}/bin/snap --nosplash --modules --install org.esa.snap.sar
 
 # ==== PIP SETUP ====
 RUN python -m pip install --upgrade pip
@@ -39,4 +39,5 @@ COPY . /tmp
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8880
+
 
