@@ -16,14 +16,14 @@ if [[ $gpu == *' nvidia '* ]]; then
     --ulimit memlock=-1 \
     --ulimit stack=67108864 \
     --name fire-detection \
-    -p 8880:8880 \
+    -p 8881:8881 \
     fire-detection bash
 else
   docker run -it --rm \
     --privileged=true \
     --mount "type=bind,src=$(pwd),dst=/tmp/" \
     --workdir /tmp/ \
-    -p 8880:8880 \
+    -p 8881:8881 \
     --name fire-detection \
     fire-detection bash
 fi

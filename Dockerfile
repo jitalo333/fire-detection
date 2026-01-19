@@ -10,4 +10,4 @@ RUN apt-get update
 WORKDIR /tmp/
 ENV PATH=$PATH:~/.local/bin
 RUN pip3 install -r requirements.txt
-EXPOSE 8880
+EXPOSE 8881
